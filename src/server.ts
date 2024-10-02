@@ -2,7 +2,9 @@ import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import userRoute from './routes/userRoutes'
+import connectDB from './db/mongoDB'
 dotenv.config()
+connectDB()
 
 const app = express()
 const PORT = process.env.PORT || 3000

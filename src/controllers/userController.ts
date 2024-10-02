@@ -1,40 +1,42 @@
 import { Request, Response } from "express";
-import { users } from "../data/users";
-import { IUser } from "../types";
 import bcrypt from 'bcrypt';
 import StatusCode from "../status/httpStatusCode";
+import User from "../model/userModel";
 
 const SALT_ROUNDS = 10;
 
 // User Registration ==========================>
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
+        console.log("body =>", req.body);
         const { userEmail, password, userName } = req.body as { userEmail: string; password: string; userName: string };
 
-        // Check if user already exists
-        const existingUser = users.find(user => user.userEmail === userEmail);
+        // Check if user already exists in the database
+        const existingUser = await User.findOne({ email: userEmail });
         if (existingUser) {
             res.status(StatusCode.CONFLICT).json({ message: "User already exists." });
-            return
+            return;
         }
 
         // Hash the password
         const hashedPass = await bcrypt.hash(password, SALT_ROUNDS);
-        const newUser: IUser = {
-            id: users.length + 1,
-            userEmail: userEmail,
-            userName: userName,
-            passwordHash: hashedPass,
-        };
+        
+        // Create a new user instance
+        const newUser = new User({
+            userEmail,
+            userName,
+            password: hashedPass,
+        });
 
-        // Save new user
-        users.push(newUser);
+        // Save new user to the database
+        await newUser.save();
+        console.log("-u", newUser);
         res.status(StatusCode.CREATED).json(newUser);
-        return
+        return;
     } catch (error) {
-        console.error("Registration error:", error); // Log the error
+        console.error("Registration error:", error);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while registering the user." });
-        return
+        return;
     }
 }
 
@@ -42,27 +44,29 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { userEmail, password } = req.body as { userEmail: string; password: string };
+        console.log("Checking for user:", userEmail);
 
-        // Find the user by email
-        const findUser = users.find(user => user.userEmail === userEmail);
+        // Find the user by email in the database
+        const findUser = await User.findOne({ email: userEmail });
+        console.log("user ->", findUser);
         if (!findUser) {
             res.status(StatusCode.NOT_FOUND).json({ message: "User not found." });
-            return
+            return;
         }
 
-        // Compare password
-        const comparedPass = await bcrypt.compare(password, findUser.passwordHash);
+        // Compare the password
+        const comparedPass = await bcrypt.compare(password, findUser.password);
         if (!comparedPass) {
             res.status(StatusCode.BAD_REQUEST).json({ message: "Password incorrect." });
-            return
+            return;
         }
 
         // Successful login
-        res.status(StatusCode.OK).json({ message: "Login successful.", userId: findUser.id });
-        return
+        res.status(StatusCode.OK).json({ message: "Login successful.", findUser });
+        return;
     } catch (error) {
         console.error("Login error:", error);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while logging in." });
-        return
+        return;
     }
 }
