@@ -8,7 +8,7 @@ const SALT_ROUNDS = 10;
 // User Registration ==========================>
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        console.log("body =>", req.body);
+      
         const { userEmail, password, userName } = req.body as { userEmail: string; password: string; userName: string };
         
         // Check if user already exists in the database
@@ -30,7 +30,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
         // Save new user to the database
         await newUser.save();
-        console.log("-u", newUser);
         res.status(StatusCode.CREATED).json(newUser);
         return;
     } catch (error) {

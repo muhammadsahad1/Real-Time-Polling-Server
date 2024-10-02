@@ -17,4 +17,6 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use('/api/users', userRoute);
+// app.use('/api/poll',)
+
 app.listen(PORT, () => console.log(`server is running: => http://localhost:${PORT}`))
