@@ -10,7 +10,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     try {
         console.log("body =>", req.body);
         const { userEmail, password, userName } = req.body as { userEmail: string; password: string; userName: string };
-
+        
         // Check if user already exists in the database
         const existingUser = await User.findOne({ email: userEmail });
         if (existingUser) {
@@ -20,11 +20,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
         // Hash the password
         const hashedPass = await bcrypt.hash(password, SALT_ROUNDS);
-        
+
         // Create a new user instance
-        const newUser = new User({
-            userEmail,
-            userName,
+        const newUser = await User.create({
+            name : userName,
+            email : userEmail,
             password: hashedPass,
         });
 
