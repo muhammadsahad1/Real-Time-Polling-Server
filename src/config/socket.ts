@@ -19,14 +19,26 @@ const createServer = (server: http.Server) => {
             socket.to(pollId).emit('voteUpdated', { optionIndex });
         });
 
+        socket.on('typing', (data) => {
+            const { pollId, userId, username } = data;
+            socket.to(pollId).emit('userTyping', { pollId, userId, username });
+        });
+
+        socket.on('stopTyping', (data) => {
+            const { pollId, userId } = data;
+            socket.to(pollId).emit('userStopTyping', { pollId, userId });
+        });
+
         socket.on('sendMessage', (data) => {
-
-            const { pollId, message, senderId, username } = data
+            const { pollId, message, senderId, username } = data;
             socket.to(pollId).emit('receiveMessage', {
-                content: message, sender: {
-                    _id: senderId, username: username
-                }, poll: pollId
-
+                _id: new Date().getTime().toString(), // Generate a temporary ID
+                content: message,
+                sender: {
+                    _id: senderId,
+                    username: username
+                },
+                pollId: pollId
             });
         });
 

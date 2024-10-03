@@ -63,7 +63,6 @@ export const voting = async (req: Request, res: Response, io: Server): Promise<v
     try {
         const { pollId, userId } = req.params;
         const { optionIndex } = req.body;
-        console.log("userId =>", userId)
         const userID = new mongoose.Types.ObjectId(userId);
 
         // Check if poll exists
@@ -80,27 +79,22 @@ export const voting = async (req: Request, res: Response, io: Server): Promise<v
         if (prevVoteOption !== -1) {
             poll.options[prevVoteOption].votes -= 1;
             poll.options[prevVoteOption].votedBy = poll.options[prevVoteOption].votedBy.filter(id => !id.equals(userID));
-            console.log("afterUpD =>", poll.options[prevVoteOption].votedBy);
-
         }
-
 
         poll.options[optionIndex].votes += 1;
         poll.options[optionIndex].votedBy.push(userID);
-        poll.totalVotes += 1;
 
-        // Save the updated poll
+
+        poll.totalVotes = poll.options.reduce((acc, option) => acc + option.votes, 0);
+    
         await poll.save();
-
-        // Emit the updated vote information
-        // io.to(pollId).emit('voteUpdated', { optionIndex, totalVotes: poll.totalVotes, options: poll.options });
 
         res.status(StatusCode.OK).json({
             message: "Vote counted successfully",
             data: poll,
         });
+        
     } catch (error) {
-        console.error("Error voting:", error);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
             message: "Internal Server Error",
             error: error instanceof Error ? error.message : "An error occurred",
