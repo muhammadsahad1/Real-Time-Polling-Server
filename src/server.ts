@@ -5,7 +5,8 @@ import userRoute from './routes/userRoutes'
 import connectDB from './db/mongoDB'
 import pollRoute from './routes/pollRoutes'
 import createServer from './config/socket'
-import http from "http";
+import http from "http"
+import messageRoute from './routes/messageRoutes'
 dotenv.config()
 
 const app = express()
@@ -23,11 +24,12 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
     res.send('Hello aliens');
 });
 
-app.use('/api/users', userRoute);
-app.use('/api/polls', pollRoute)
-
 const server = http.createServer(app)
 
-createServer(server)
+const io = createServer(server)
+app.use('/api/users', userRoute);
+app.use('/api/polls', pollRoute(io))    
+app.use('/api/messages', messageRoute(io))
+
 
 server.listen(PORT, () => console.log(`server is running: => http://localhost:${PORT}`))

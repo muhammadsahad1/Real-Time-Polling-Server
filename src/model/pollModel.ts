@@ -24,7 +24,7 @@ export interface PollDocument extends Document {
 
 const pollOptionSchema = new Schema<PollOption>({
     text: { type: String, required: true },
-    votedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],  // Reference to User model
+    votedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
     votes: { type: Number, default: 0 },
 });
 
@@ -45,5 +45,4 @@ const pollSchema = new Schema<PollDocument>(
 
 
 const Poll = mongoose.model<PollDocument>('Poll', pollSchema);
-
 export default Poll;

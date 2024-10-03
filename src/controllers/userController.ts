@@ -8,9 +8,9 @@ const SALT_ROUNDS = 10;
 // User Registration ==========================>
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      
+
         const { userEmail, password, userName } = req.body as { userEmail: string; password: string; userName: string };
-        
+
         // Check if user already exists in the database
         const existingUser = await User.findOne({ email: userEmail });
         if (existingUser) {
@@ -23,8 +23,8 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
         // Create a new user instance
         const newUser = await User.create({
-            name : userName,
-            email : userEmail,
+            name: userName,
+            email: userEmail,
             password: hashedPass,
         });
 
@@ -43,7 +43,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { userEmail, password } = req.body as { userEmail: string; password: string };
-        console.log("Checking for user:", userEmail);
+        console.log("Checking for user:", req.body);
 
         // Find the user by email in the database
         const findUser = await User.findOne({ email: userEmail });
