@@ -1,6 +1,10 @@
 import express, { Router } from 'express'
-import { createPoll } from '../controllers/pollController'
+import { createPoll, getPolls } from '../controllers/pollController'
 
 const pollRoute : Router = express.Router()
 
-pollRoute.post('/creatPoll',createPoll)
+pollRoute.post('/createPoll',createPoll)
+pollRoute.get('/',getPolls)
+pollRoute.post('/polls/vote',)
+
+export default pollRoute

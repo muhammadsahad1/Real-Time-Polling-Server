@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const mongoURL: string = process.env.MONGO_URL || '';
+console.log("moURL", mongoURL);
+
 
 if (!mongoURL) {
   console.error('MongoDB URL is not defined. Check your .env file.');

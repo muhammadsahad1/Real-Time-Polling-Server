@@ -3,13 +3,20 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import userRoute from './routes/userRoutes'
 import connectDB from './db/mongoDB'
+import pollRoute from './routes/pollRoutes'
+import createServer from './config/socket'
+import http from "http";
 dotenv.config()
-connectDB()
 
 const app = express()
 const PORT = process.env.PORT || 3000
+connectDB()
 
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+}))
 app.use(express.json())
 
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
@@ -17,6 +24,10 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use('/api/users', userRoute);
-// app.use('/api/poll',)
+app.use('/api/polls', pollRoute)
 
-app.listen(PORT, () => console.log(`server is running: => http://localhost:${PORT}`))
+const server = http.createServer(app)
+
+createServer(server)
+
+server.listen(PORT, () => console.log(`server is running: => http://localhost:${PORT}`))

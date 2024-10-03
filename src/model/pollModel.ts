@@ -3,14 +3,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 interface PollOption {
     text: string;
-    votedBy: mongoose.Types.ObjectId[];  
+    votedBy: mongoose.Types.ObjectId[];
     votes: number;
 }
 
-
 export interface PollDocument extends Document {
     title: string;
-    description: string;
     options: PollOption[];
     creator: {
         _id: mongoose.Types.ObjectId;
@@ -33,8 +31,7 @@ const pollOptionSchema = new Schema<PollOption>({
 const pollSchema = new Schema<PollDocument>(
     {
         title: { type: String, required: true },
-        description: { type: String, required: true },
-        options: [pollOptionSchema],  
+        options: [pollOptionSchema],
         creator: {
             _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Reference to User model
             username: { type: String, required: true },
